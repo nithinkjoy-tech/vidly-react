@@ -14,6 +14,7 @@ class Movies extends Component {
   state = {
     movies: [],
     genres: [],
+    isLoading:true,
     pageSize: 4,
     searchQuery: "",
     currentPage: 1,
@@ -26,7 +27,7 @@ class Movies extends Component {
     const genres = [{ _id: "", name: "All Genres" }, ...data];
 
     const { data: movies } = await getMovies();
-    this.setState({ movies, genres });
+    this.setState({ movies, genres,isLoading:false });
   }
 
   handleLike = (movie) => {
@@ -93,12 +94,12 @@ class Movies extends Component {
   };
 
   render() {
-    const { length: count } = this.state.movies;
-    const { sortColumn, searchQuery } = this.state;
+    const { sortColumn, searchQuery,isLoading } = this.state;
     const {user}=this.props
 
     const { totalCount, data: movies } = this.getPagedData();
 
+    if(isLoading===true) return <p>Loading please wait</p>
     return (
       <div className="row">
         <div className="col-3">
