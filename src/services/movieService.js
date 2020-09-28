@@ -10,6 +10,10 @@ export function getMovies(){
     return http.get(apiEndpoint)
 }
 
+export function likeMovie(movieId){
+    return http.patch(movieUrl(movieId))
+}
+
 export function getMovie(movieId) {
     return http.get(movieUrl(movieId))
   }

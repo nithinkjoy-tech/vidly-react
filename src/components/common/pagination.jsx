@@ -15,7 +15,7 @@ const Pagination = (props) => {
         <ul className="pagination">
           {page.map((page) => (
             <li key={page} className={props.currentPage===page?"page-item active":"page-item"}>
-              <a className="page-link" onClick={()=>props.onClick(page)} >{page}</a>
+              <button className="page-link" onClick={()=>props.onClick(page)} >{page}</button>
             </li>
           ))}
         </ul>
@@ -25,10 +25,8 @@ const Pagination = (props) => {
 };
 
 Pagination.propTypes={
-    itemsCount:PropTypes.number.isRequired,
     pageSize:PropTypes.number.isRequired,
     currentPage:PropTypes.number.isRequired,
-    onPageChange:PropTypes.func.isRequired
 }
 
 export default Pagination;

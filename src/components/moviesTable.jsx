@@ -12,7 +12,6 @@ class MoviesTable extends Component {
       content: (movie) => (
         <Link to={`/movies/${movie._id}`}>
           {movie.title}
-          {console.log(movie)}
         </Link>
       ),
     },

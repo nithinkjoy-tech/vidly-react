@@ -29,8 +29,6 @@ class Form extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-
-    console.log("hereee")
     let errors = this.validate();
     this.setState({ errors });
     if (errors) return;

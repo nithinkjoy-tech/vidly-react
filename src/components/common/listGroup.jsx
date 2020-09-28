@@ -7,9 +7,8 @@ const ListGroup = (props) => {
         <React.Fragment>
         <ul className="list-group clickable">
             {items.map(item=><li 
-            onClick={()=>onItemSelect(item)}
             key={item[valueProperty]}
-            onClick={()=>props.onItemSelect(item[valueProperty])} 
+            onClick={()=>onItemSelect(item[valueProperty])} 
             className={item[valueProperty]===selectedItem?"list-group-item active":"list-group-item"}>{item[textProperty]}</li>)}
         </ul>
         </React.Fragment>

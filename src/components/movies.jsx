@@ -1,20 +1,21 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { toast } from 'react-toastify';
-import { getMovies, deleteMovie } from "../services/movieService";
+import { toast } from "react-toastify";
+import { getMovies, deleteMovie, likeMovie } from "../services/movieService";
 import { getGenres } from "../services/genreService";
 import { paginate } from "../utils/paginate";
 import MoviesTable from "./moviesTable";
 import ListGroup from "./common/listGroup";
 import Pagination from "./common/pagination";
 import SearchBox from "./common/searchBox";
+import ReactLoading from "react-loading";
+import auth from "../services/authService";
 import _ from "lodash";
-
 class Movies extends Component {
   state = {
     movies: [],
     genres: [],
-    isLoading:true,
+    isLoading: true,
     pageSize: 4,
     searchQuery: "",
     currentPage: 1,
@@ -27,15 +28,24 @@ class Movies extends Component {
     const genres = [{ _id: "", name: "All Genres" }, ...data];
 
     const { data: movies } = await getMovies();
-    this.setState({ movies, genres,isLoading:false });
+    this.setState({ movies, genres, isLoading: false });
   }
 
-  handleLike = (movie) => {
+  handleLike = async (movie) => {
+    if (!auth.getCurrentUser()) {
+      return toast.info("You have to login for liking a movie");
+    }
+
     let movies = [...this.state.movies];
     let index = movies.indexOf(movie);
     movies[index] = { ...movie };
     movies[index].liked = !movie.liked;
     this.setState({ movies });
+    try {
+      await likeMovie(movie._id);
+    } catch (ex) {
+      toast.error("something went wrong.");
+    }
   };
 
   handleDelete = async (movieId) => {
@@ -45,10 +55,10 @@ class Movies extends Component {
 
     try {
       await deleteMovie(movieId);
-    }catch(ex){
-      if(ex.response&&ex.response.status===404)
-      toast.error("This movie has already been deleted")
-      this.setState({movies:originalMovies})
+    } catch (ex) {
+      if (ex.response && ex.response.status === 404)
+        toast.error("This movie has already been deleted");
+      this.setState({ movies: originalMovies });
     }
   };
 
@@ -94,12 +104,21 @@ class Movies extends Component {
   };
 
   render() {
-    const { sortColumn, searchQuery,isLoading } = this.state;
-    const {user}=this.props
-
+    const { sortColumn, searchQuery, isLoading } = this.state;
+    const { user } = this.props;
     const { totalCount, data: movies } = this.getPagedData();
 
-    if(isLoading===true) return <p>Loading please wait</p>
+    if (isLoading)
+      return (
+        <center>
+          <ReactLoading
+            type={"bars"}
+            color={"#fff025"}
+            height={"10%"}
+            width={"50%"}
+          />
+        </center>
+      );
     return (
       <div className="row">
         <div className="col-3">
@@ -110,13 +129,15 @@ class Movies extends Component {
           />
         </div>
         <div className="col">
-          {user&&(<Link
-            to="/movies/new"
-            className="btn btn-primary"
-            stype={{ marginBottom: 20 }}
-          >
-            New Movie
-          </Link>)}
+          {user && (
+            <Link
+              to="/movies/new"
+              className="btn btn-primary"
+              stype={{ marginBottom: 20 }}
+            >
+              New Movie
+            </Link>
+          )}
           <p>There are {totalCount} movies in the database</p>
           <SearchBox value={searchQuery} onChange={this.handleSearch} />
           <MoviesTable
